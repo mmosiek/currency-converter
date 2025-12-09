@@ -113,7 +113,6 @@ function inputFilter() {
 
   v = v.replace(/[^0-9.]/g, "");
 
-  // Tylko jedna kropka
   const parts = v.split(".");
   if (parts.length > 2) {
     v = parts[0] + "." + parts.slice(1).join("");
@@ -143,3 +142,4 @@ loadCurrencies();
 </script>
 </body>
 </html>
+
