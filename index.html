@@ -61,14 +61,11 @@ async function loadCurrencies() {
     const res = await fetch('https://api.frankfurter.app/currencies');
     const data = await res.json();
     for (const [code, name] of Object.entries(data)) {
-      const option1 = new Option(`${code} — ${name}`, code);
-      const option2 = new Option(`${code} — ${name}`, code);
-      fromSelect.add(option1);
-      toSelect.add(option2);
+      fromSelect.add(new Option(`${code} — ${name}`, code));
+      toSelect.add(new Option(`${code} — ${name}`, code));
     }
     fromSelect.value = 'USD';
     toSelect.value = 'EUR';
-    convert();
   } catch (e) {
     console.error('Error loading currencies', e);
   }
@@ -78,11 +75,18 @@ async function convert() {
   const amount = parseFloat(amountInput.value);
   const from = fromSelect.value;
   const to = toSelect.value;
-  if (!amount || amount <= 0) return;
+
+  if (isNaN(amount) || amount <= 0) {
+    resultInput.value = "";
+    return;
+  }
 
   try {
-    const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`);
+    const res = await fetch(
+      `https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`
+    );
     const data = await res.json();
+
     if (data.rates && data.rates[to] !== undefined) {
       resultInput.value = parseFloat(data.rates[to].toFixed(2));
     } else {
