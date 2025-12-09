@@ -32,7 +32,7 @@
   <div>
     <article>
       <header><strong>Amount</strong></header>
-      <input id="amount" type="number" placeholder="Enter amount" value="0" min="0" step="any"
+      <input id="amount" type="text" placeholder="Enter amount" value="0"
              autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </article>
     <article>
@@ -101,10 +101,41 @@ async function convert() {
 let timeout;
 function debounceConvert() {
   clearTimeout(timeout);
-  timeout = setTimeout(convert, 250);
+  timeout = setTimeout(convert, 500);
 }
 
-amountInput.addEventListener('input', debounceConvert);
+function inputFilter() {
+  let v = amountInput.value;
+
+  const original = v;
+
+  v = v.replace(",", ".");
+
+  v = v.replace(/[^0-9.]/g, "");
+
+  // Tylko jedna kropka
+  const parts = v.split(".");
+  if (parts.length > 2) {
+    v = parts[0] + "." + parts.slice(1).join("");
+  }
+
+  if (v !== original) {
+    amountInput.value = v;
+  }
+
+  if (v.trim() === "" || isNaN(parseFloat(v))) {
+    resultInput.value = "";
+    return false;
+  }
+
+  return true;
+}
+
+amountInput.addEventListener('input', () => {
+  const ok = inputFilter();
+  if (ok) debounceConvert();
+});
+
 fromSelect.addEventListener('change', debounceConvert);
 toSelect.addEventListener('change', debounceConvert);
 
