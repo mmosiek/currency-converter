@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Currency Converter</title>
+<link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+<style>
+  .grid > div { display:flex; flex-direction:column; gap:0.25rem; }
+  #result { text-align:center; font-size:2rem; font-weight:bold; }
+</style>
+</head>
+<body>
+<main class="container">
+<hgroup>
+  <h2>Currency Converter</h2>
+  <p>Convert between different currencies instantly</p>
+</hgroup>
+
+<div class="grid">
+  <div>
+    <article>
+      <header><strong>From Currency</strong></header>
+      <select id="from-currency" autocomplete="off"></select>
+    </article>
+    <article>
+      <header><strong>To Currency</strong></header>
+      <select id="to-currency" autocomplete="off"></select>
+    </article>
+  </div>
+
+  <div>
+    <article>
+      <header><strong>Amount</strong></header>
+      <input id="amount" type="number" placeholder="Enter amount" value="0" min="0" step="any"
+             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+    </article>
+    <article>
+      <header><strong>Converted Amount</strong></header>
+      <input id="result" readonly placeholder="0.00" autocomplete="off">
+    </article>
+  </div>
+</div>
+
+<footer style="text-align:center;">
+  <small>
+    Made by <a href="https://github.com/mmosiek" class="secondary">mmosiek</a> · 
+    <a href="https://github.com/mmosiek/currency-converter" class="secondary">GitHub</a>
+  </small>
+</footer>
+</main>
+
+<script>
+const fromSelect = document.getElementById('from-currency');
+const toSelect = document.getElementById('to-currency');
+const amountInput = document.getElementById('amount');
+const resultInput = document.getElementById('result');
+
+async function loadCurrencies() {
+  try {
+    const res = await fetch('https://api.frankfurter.app/currencies');
+    const data = await res.json();
+    for (const [code, name] of Object.entries(data)) {
+      const option1 = new Option(`${code} — ${name}`, code);
+      const option2 = new Option(`${code} — ${name}`, code);
+      fromSelect.add(option1);
+      toSelect.add(option2);
+    }
+    fromSelect.value = 'USD';
+    toSelect.value = 'EUR';
+    convert();
+  } catch (e) {
+    console.error('Error loading currencies', e);
+  }
+}
+
+async function convert() {
+  const amount = parseFloat(amountInput.value);
+  const from = fromSelect.value;
+  const to = toSelect.value;
+  if (!amount || amount <= 0) return;
+
+  try {
+    const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`);
+    const data = await res.json();
+    if (data.rates && data.rates[to] !== undefined) {
+      resultInput.value = parseFloat(data.rates[to].toFixed(2));
+    } else {
+      resultInput.value = 'ERROR';
+    }
+  } catch (e) {
+    console.error('Conversion error', e);
+    resultInput.value = 'ERROR';
+  }
+}
+
+let timeout;
+function debounceConvert() {
+  clearTimeout(timeout);
+  timeout = setTimeout(convert, 250);
+}
+
+amountInput.addEventListener('input', debounceConvert);
+fromSelect.addEventListener('change', debounceConvert);
+toSelect.addEventListener('change', debounceConvert);
+
+loadCurrencies();
+</script>
+</body>
+</html>
