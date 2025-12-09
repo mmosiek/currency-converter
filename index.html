@@ -32,8 +32,8 @@
   <div>
     <article>
       <header><strong>Amount</strong></header>
-      <input id="amount" type="text" placeholder="Enter amount" value=""
-             autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+      <input id="amount" type="text" inputmode="decimal" pattern="[0-9.]*" placeholder="Enter amount"
+      autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
     </article>
     <article>
       <header><strong>Converted Amount</strong></header>
@@ -142,6 +142,7 @@ loadCurrencies();
 </script>
 </body>
 </html>
+
 
 
 
