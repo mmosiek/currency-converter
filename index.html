@@ -101,7 +101,7 @@ async function convert() {
 let timeout;
 function debounceConvert() {
   clearTimeout(timeout);
-  timeout = setTimeout(convert, 500);
+  timeout = setTimeout(convert, 250);
 }
 
 function inputFilter() {
@@ -142,4 +142,5 @@ loadCurrencies();
 </script>
 </body>
 </html>
+
 
